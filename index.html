@@ -94,29 +94,23 @@
       </thead>
       <tbody></tbody>
       <tfoot>
-        <tr>
-          <td colspan="5" style="text-align:right">Sub-Total</td>
-          <td id="subTotal">₹0</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="3">
-            <label class="muted"><input type="checkbox" id="gstToggle" onchange="recalc()"> Apply GST 18%</label>
-          </td>
-          <td colspan="2" style="text-align:right">GST (18%)</td>
-          <td id="gstAmt">₹0</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="3">
-            <label>Freight / Other (₹)</label>
-            <input type="number" id="freight" value="0" min="0" oninput="recalc()" style="width:160px"/>
-          </td>
-          <td colspan="2" style="text-align:right">Grand Total</td>
-          <td id="grandTotal">₹0</td>
-          <td></td>
-        </tr>
-      </tfoot>
+  <tr>
+    <td colspan="5" style="text-align:right">Sub-Total</td>
+    <td id="subTotal">₹0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan="5" style="text-align:right">GST (18%)</td>
+    <td id="gstAmt">₹0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan="5" style="text-align:right"><strong>Grand Total</strong></td>
+    <td id="grandTotal">₹0</td>
+    <td></td>
+  </tr>
+</tfoot>
+
     </table>
 
     <div class="flex right" style="margin-top:14px">
@@ -182,11 +176,10 @@ const $op = document.getElementById('operation');
 const $qty = document.getElementById('qty');
 const $unit = document.getElementById('unitPrice');
 const $tbody = document.querySelector('#quoteTable tbody');
-const $sub = document.getElementById('subTotal');
-const $gstToggle = document.getElementById('gstToggle');
-const $gstAmt = document.getElementById('gstAmt');
-const $freight = document.getElementById('freight');
+const $sub   = document.getElementById('subTotal');
+const $gstAmt= document.getElementById('gstAmt');
 const $grand = document.getElementById('grandTotal');
+
 
 let rows = [];
 
@@ -323,20 +316,20 @@ function removeRow(i){
 }
 
 function recalc(){
-  const sub = rows.reduce((a,b)=>a+b.total,0);
-  $sub.textContent = "₹"+sub.toLocaleString('en-IN',{maximumFractionDigits:2});
-  const gst = $gstToggle.checked ? sub*0.18 : 0;
-  $gstAmt.textContent = "₹"+gst.toLocaleString('en-IN',{maximumFractionDigits:2});
-  const freight = Math.max(0, parseFloat($freight.value||'0'));
-  const grand = sub + gst + freight;
-  $grand.textContent = "₹"+grand.toLocaleString('en-IN',{maximumFractionDigits:2});
+  const sub   = rows.reduce((a,b)=>a + b.total, 0);
+  const gst   = +(sub * 0.18).toFixed(2);  // fixed 18%
+  const grand = sub + gst;
+
+  $sub.textContent    = "₹" + sub.toLocaleString('en-IN',{maximumFractionDigits:2});
+  $gstAmt.textContent = "₹" + gst.toLocaleString('en-IN',{maximumFractionDigits:2});
+  $grand.textContent  = "₹" + grand.toLocaleString('en-IN',{maximumFractionDigits:2});
 }
+
 
 function resetAll(){
   rows = [];
   renderRows();
   document.getElementById('discount').value = 25;
- $freight.value = 0; $gstToggle.checked = false;
   recalc();
 }
 
@@ -363,23 +356,22 @@ function downloadPDF(){
     body
   });
 
-  const y = (doc.lastAutoTable?.finalY || 26) + 8;
-  const sub = document.getElementById('subTotal').innerText.replace(/[₹,]/g,'').trim();
-  const gst = document.getElementById('gstAmt').innerText.replace(/[₹,]/g,'').trim();
-  const freight = parseFloat(document.getElementById('freight').value||'0');
-  const grand = document.getElementById('grandTotal').innerText.replace(/[₹,]/g,'').trim();
+ const y = (doc.lastAutoTable?.finalY || 26) + 8;
+const sub   = rows.reduce((a,b)=>a+b.total, 0);
+const gst   = +(sub * 0.18).toFixed(2);
+const grand = sub + gst;
 
-  doc.setFontSize(11);
-  doc.text(`Sub-Total: INR ${Number(sub).toLocaleString('en-IN',{maximumFractionDigits:2})}`,14,y);
-  doc.text(`GST (18%): INR ${Number(gst).toLocaleString('en-IN',{maximumFractionDigits:2})}`,14,y+6);
-  doc.text(`Freight/Other: INR ${freight.toLocaleString('en-IN',{maximumFractionDigits:2})}`,14,y+12);
-  doc.setFont(undefined,'bold');
-  doc.text(`Grand Total: INR ${Number(grand).toLocaleString('en-IN',{maximumFractionDigits:2})}`,14,y+20);
-  doc.setFont(undefined,'normal');
-  doc.setFontSize(9);
-  doc.text('Notes: Prices exclusive of GST. Freight as actual. Price at time of dispatch applies.',14,y+28);
+doc.setFontSize(11);
+doc.text(`Sub-Total: INR ${sub.toLocaleString('en-IN',{maximumFractionDigits:2})}`, 14, y);
+doc.text(`GST (18%): INR ${gst.toLocaleString('en-IN',{maximumFractionDigits:2})}`, 14, y+6);
+doc.setFont(undefined,'bold');
+doc.text(`Grand Total: INR ${grand.toLocaleString('en-IN',{maximumFractionDigits:2})}`, 14, y+14);
+doc.setFont(undefined,'normal');
+doc.setFontSize(9);
+doc.text('Notes: Prices exclusive of GST. Price at time of dispatch applies.', 14, y+22);
 
-  doc.save('Advance-Valves-Quotation.pdf');
+doc.save('Advance-Valves-Quotation.pdf');
+
 }
 
 /* ---- WhatsApp ---- */
@@ -390,15 +382,18 @@ function sendWA(){
   rows.forEach(r=>{
     msg += `• ${r.cat} | ${r.size} NB ${r.op? '| '+r.op : ''} | Qty ${r.qty} | Unit ₹${(r.unit*(1-r.discountPct/100)).toLocaleString('en-IN',{maximumFractionDigits:2})} | Line ₹${r.total.toLocaleString('en-IN',{maximumFractionDigits:2})}\n`;
   });
-  const sub = document.getElementById('subTotal').innerText;
-  const gst = document.getElementById('gstAmt').innerText;
-  const freight = Number(document.getElementById('freight').value||0).toLocaleString('en-IN',{maximumFractionDigits:2});
-  const grand = document.getElementById('grandTotal').innerText;
-  msg += `\nSub-Total: ${sub}\nGST (18%): ${gst}\nFreight/Other: ₹${freight}\nGrand Total: ${grand}\n\n`;
-  msg += `Contact: 9999889008 • sales@vijaysalescorp.com`;
+  const sub   = rows.reduce((a,b)=>a+b.total, 0);
+const gst   = +(sub * 0.18).toFixed(2);
+const grand = sub + gst;
 
-  const url = `https://wa.me/919999889008?text=${encodeURIComponent(msg)}`;
-  window.open(url,'_blank');
+msg += `\nSub-Total: ₹${sub.toLocaleString('en-IN',{maximumFractionDigits:2})}`;
+msg += `\nGST (18%): ₹${gst.toLocaleString('en-IN',{maximumFractionDigits:2})}`;
+msg += `\nGrand Total: ₹${grand.toLocaleString('en-IN',{maximumFractionDigits:2})}\n\n`;
+msg += `Contact: 9999889008 • sales@vijaysalescorp.com`;
+
+const url = `https://wa.me/919999889008?text=${encodeURIComponent(msg)}`;
+window.open(url,'_blank');
+
 }
 </script>
 </body>
