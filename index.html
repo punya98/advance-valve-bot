@@ -386,15 +386,16 @@ function renderRows(){
   $tbody.innerHTML = '';
   rows.forEach((r,idx)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${r.cat}</td>
-      <td>${r.size}</td>
-      <td>${r.op||'-'}</td>
-      <td>₹${(r.unit*(1-r.discountPct/100)).toLocaleString('en-IN',{maximumFractionDigits:2})}</td>
-      <td>${r.qty}</td>
-      <td>₹${r.total.toLocaleString('en-IN',{maximumFractionDigits:2})}</td>
-      <td><button class="btn secondary" onclick="removeRow(${idx})">X</button></td>
-    `;
+   tr.innerHTML = `
+  <td data-label="Product">${r.cat}</td>
+  <td data-label="Size (NB)">${r.size}</td>
+  <td data-label="Operation">${r.op || '-'}</td>
+  <td data-label="Unit Price (₹)">₹${(r.unit*(1-r.discountPct/100)).toLocaleString('en-IN',{maximumFractionDigits:2})}</td>
+  <td data-label="Qty">${r.qty}</td>
+  <td data-label="Line Total (₹)">₹${r.total.toLocaleString('en-IN',{maximumFractionDigits:2})}</td>
+  <td data-label="Remove"><button class="btn secondary" onclick="removeRow(${idx})">X</button></td>
+`;
+
     $tbody.appendChild(tr);
   });
   recalc();
