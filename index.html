@@ -67,7 +67,7 @@
       </div>
       <div>
         <label for="discount">Discount (%)</label>
-        <input type="number" id="discount" value="0" min="0" max="100" step="0.5"/>
+        <input type="number" id="discount" value="25" readonly />
       </div>
       <div>
         <label>&nbsp;</label>
@@ -146,10 +146,7 @@ const ADV_DATA = {
     prices: { "50":2934,"65":3090,"80":3371,"100":4557,"125":5681,"150":6555,"200":11145,"200-Gear":14585,"250-Gear":23597,"300-Gear":33211,"350-Gear":50940 },
     // special handling: 200 has both Lever & Gear; 250/300/350 are Gear only; others assumed Lever
     operationBySize: {} // will be computed dynamically below
-  },
-  "Butterfly Valve PN20 (SS-304 Disc)": {
-    prices: { "50":11766 },
-    operationBySize: { "50":"Lever" }
+  
   },
   "Dual Plate NRV PN16": {
     prices: { "50":2310,"65":2622,"80":3184,"100":4620,"125":6680,"150":8178,"200":14483,"250":21849,"300":34709 },
@@ -291,7 +288,7 @@ function addItem(){
   const unit = ADV_DATA[cat].prices[sizeKey];
   if(!unit) return alert('Invalid selection');
 
-  const discountPct = Math.max(0, Math.min(100, parseFloat(document.getElementById('discount').value||'0')));
+  const discountPct = 25; // fixed discount
   const unitAfterDisc = unit * (1 - discountPct/100);
   const line = unitAfterDisc * qty;
 
@@ -338,8 +335,8 @@ function recalc(){
 function resetAll(){
   rows = [];
   renderRows();
-  document.getElementById('discount').value = 0;
-  $freight.value = 0; $gstToggle.checked = false;
+  document.getElementById('discount').value = 25;
+ $freight.value = 0; $gstToggle.checked = false;
   recalc();
 }
 
