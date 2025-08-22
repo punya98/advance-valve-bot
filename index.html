@@ -27,8 +27,8 @@
   .btn.secondary{background:#fff;color:var(--brand);border:2px solid var(--brand)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
 
+  /* Desktop table */
   table{width:100%;border-collapse:collapse;margin-top:10px}
-  /* keeps classic table on desktop */
   #quoteTable{width:100%;table-layout:auto;min-width:760px}
   th,td{border:1px solid #e3e6eb;padding:10px;text-align:center}
   th{background:var(--brand);color:#fff}
@@ -38,10 +38,16 @@
   .right{justify-content:flex-end}
   .muted{color:#666;font-size:12px}
 
-  /* Helpers */
+  /* Helpers + ensure full-row placement */
   .table-responsive{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .divider{border:0;border-top:1px solid #e3e6eb;margin:16px 0}
   .powered-by{display:block;width:100%;text-align:center;margin:16px 0 0;clear:both;color:#555;font-size:14px}
+
+  /* Force table, divider & buttons to sit UNDER each other even inside grids */
+  .card .table-responsive,
+  .card .divider,
+  .card .flex.right{grid-column:1 / -1; width:100%; float:none; clear:both; display:block}
+  .card .flex.right{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:14px}
 
   /* =======================
      Mobile: 2-column card view
@@ -50,6 +56,7 @@
     main{padding:0 12px}
     h1{font-size:clamp(20px,5.5vw,26px)}
     label{font-size:14px}
+    th,td{padding:8px 6px;font-size:13px}
 
     /* turn table rows into cards (no horizontal scroll) */
     #quoteTable{min-width:0; border-collapse:separate; border-spacing:0 12px}
@@ -69,16 +76,20 @@
       padding:0;
       font-size:14px;
       text-align:left;
+      background:#fff;
     }
-    #quoteTable tbody td::before{
-      content: attr(data-label);
-      display:block;
-      color:#667085;
-      font-size:12px;
-      margin-bottom:2px;
-    }
-    /* put Remove button on its own row, right aligned */
-    #quoteTable tbody td:last-child{
+
+    /* Auto labels (match your exact column order) */
+    #quoteTable tbody td:nth-child(1)::before{content:"Product: ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(2)::before{content:"Size (NB): ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(3)::before{content:"Operation: ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(4)::before{content:"Unit Price (₹): ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(5)::before{content:"Qty: ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(6)::before{content:"Line Total (₹): ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+    #quoteTable tbody td:nth-child(7)::before{content:"Remove: ";font-weight:700;color:#667085;display:block;margin-bottom:2px}
+
+    /* Put the Remove button on its own row, right aligned */
+    #quoteTable tbody td:nth-child(7){
       grid-column:1 / -1;
       justify-self:end;
     }
@@ -93,22 +104,15 @@
       border-radius:8px;
       padding:12px;
     }
-    #quoteTable tfoot td{
-      border:none;
-      padding:0;
-      font-size:14px;
-      text-align:left;
-    }
-    /* left cell = label (has colspan), right cell = value (has id). hide trailing empty cell */
-    #quoteTable tfoot td[colspan]{grid-column:1; text-align:left}
-    #quoteTable tfoot td[id]{grid-column:2; text-align:right}
+    #quoteTable tfoot td{border:none;padding:0;font-size:14px;text-align:left}
+    #quoteTable tfoot td[colspan]{grid-column:1;text-align:left}
+    #quoteTable tfoot td[id]{grid-column:2;text-align:right}
     #quoteTable tfoot td:last-child{display:none}
 
-    /* stack form fields & make buttons full width */
+    /* Buttons full-width under the table */
     .row{grid-template-columns:1fr !important}
-    .flex.right{justify-content:stretch}
-    .flex.right .btn{width:100%}
-    th,td{padding:8px 6px;font-size:13px}
+    .card .flex.right{justify-content:stretch; flex-direction:column}
+    .card .flex.right .btn{width:100%}
 
     .powered-by{font-size:13px;margin:12px 0 0}
   }
@@ -161,6 +165,8 @@
         <label>&nbsp;</label>
         <button class="btn" onclick="addItem()">Add to Quotation</button>
       </div>
+      <div>
+        
     
 
   <div class="card">
