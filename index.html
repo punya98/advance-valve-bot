@@ -152,8 +152,7 @@
       </div>
     </div>
 
-     <div> class="row cols-3" style="margin-top:12px">
-      </div>
+    
         <label for="unitPrice">Price / pc (₹)</label>
         <input type="text" id="unitPrice" readonly/>
       </div>
@@ -466,7 +465,7 @@ doc.setFont(undefined,'bold');
 doc.text(`Grand Total: INR ${grand.toLocaleString('en-IN',{maximumFractionDigits:2})}`, 14, y+14);
 doc.setFont(undefined,'normal');
 doc.setFontSize(9);
-doc.text('Notes: Prices exclusive of GST. Price at time of dispatch applies.', 14, y+22);
+doc.text('Notes: Rates are EX Delhi; Cartage & Freight shall be extra as per actual.', 14, y+22);
 
 doc.save('Advance-Valves-Quotation.pdf');
 
